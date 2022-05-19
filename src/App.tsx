@@ -1,77 +1,50 @@
-import { useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import throttle from "lodash.throttle";
-
+import TONER from "./TONER";
 import * as Tone from "tone";
 const kick = require("./kick.wav");
 const hat = require("./hat.wav");
 const snare = require("./snare.wav");
 const kickLoop = require("./kickloop.wav");
 const beatLoop1 = require("./beatloop1.wav");
+const hatLoop = require("./hatloop.wav");
 
-function App() {
+const App = () => {
   const [sounds, setSounds] = useState({
     kickLoopState: false,
     beatLoopState: false,
   });
-  const [beatlooper, setBeatlooper] = useState;
+  const [selected, setSelected] = useState();
   Tone.Transport.bpm.value = 135;
 
   console.log("BPM: " + Tone.Transport.bpm.value);
 
-  const handleKick = () => {
-    const kickPlayer = new Tone.Player(kick).toDestination();
-    Tone.loaded().then(() => {
-      kickPlayer.start();
-    });
-  };
-  const handleHat = () => {
-    const hatPlayer = new Tone.Player(hat).toDestination();
-    Tone.loaded().then(() => {
-      hatPlayer.start();
-    });
-  };
-  const handleSnare = () => {
-    const snarePlayer = new Tone.Player(snare).toDestination();
-    Tone.loaded().then(() => {
-      snarePlayer.start();
-    });
-  };
-  const handleKickLoop = () => {
-    const player = new Tone.Player(kickLoop).toDestination();
-    Tone.loaded().then(() => {
-      player.start();
-    });
-  };
-  const handleBeatLoop1 = () => {
-    const beatOnePlayer = new Tone.Player(beatLoop1).toDestination();
+  const handleLoop: any = (selected: any) => {
+    const Player = new Tone.Player(selected).toDestination();
     Tone.loaded().then(() => {
       setSounds({ ...sounds, beatLoopState: !sounds.beatLoopState });
 
       new Tone.Loop((time) => {
-        if (sounds.beatLoopState === true && time > 0) {
-          console.log(sounds.beatLoopState);
-          beatOnePlayer.start();
+        console.log(time);
+        if (time > 0) {
+          Player.start();
         } else {
-          beatOnePlayer.stop();
+          Player.stop();
         }
-      }, "1n").start(0);
+      }, "1n").start();
       Tone.Transport.start();
       Tone.start();
     });
   };
-
+  useEffect(() => {
+    console.log("tsport", Tone.Transport);
+  }, [Tone.Transport]);
   return (
     <div className="App">
-      <button onClick={handleKick}>KICK</button>
-      <button onClick={handleHat}>HAT</button>
-      <button onClick={handleSnare}>SNARE</button>
-      <button onClick={handleKickLoop}>KickLoop</button>
-      <button onClick={handleBeatLoop1}>Beat</button>
+      <TONER />
+      <button onClick={() => handleLoop(hatLoop)}>Hat</button>
     </div>
   );
-}
+};
 
 export default App;
-function beatLoopState(arg0: any, beatLoopState: any, arg2: boolean) {
-  throw new Error("Function not implemented.");
-}
